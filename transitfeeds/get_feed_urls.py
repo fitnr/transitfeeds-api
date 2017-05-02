@@ -21,8 +21,8 @@ def main():
     parser.add_argument('--location-id', type=str)
 
     parser.add_argument('--feed-id', type=str)
-    parser.add_argument('--start', type=str)
-    parser.add_argument('--finish', type=str)
+    parser.add_argument('--start', type=str, help='yyyy-mm-dd format')
+    parser.add_argument('--finish', type=str, help='yyyy-mm-dd format')
 
     parser.add_argument('--bare', action='store_true')
 

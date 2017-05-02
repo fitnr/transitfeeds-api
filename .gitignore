@@ -4,6 +4,8 @@
 # Licensed under the GPLv3 license
 # Copyright (c) 2017, Neil Freeman <contact@fakeisthenewreal.org>
 
+gtfs
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
