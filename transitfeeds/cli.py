@@ -31,7 +31,7 @@ def location_cli(api, **kwargs):
         locations = api.locations()
         rows = [[loc.id, loc.title.encode('utf8'), loc.name.encode('utf8'), loc.coords[0], loc.coords[1]] for loc in locations]
         if kwargs.get('header'):
-            rows.insert(0, ['id', 'title', 'name', 'longitude', 'latitude'])
+            rows.insert(0, ['location-id', 'title', 'name', 'longitude', 'latitude'])
 
     elif kwargs['id'] is None:
         print('A location-id required', file=sys.stderr)
@@ -41,7 +41,8 @@ def location_cli(api, **kwargs):
         # get feed objects for the location
         feeds = api.feeds(location=kwargs['id'])
         rows = [[feed.id, feed.title.encode('utf8')] for feed in feeds]
-
+        if kwargs.get('header'):
+            rows.insert(0, ['feed-id', 'title'])
     return rows
 
 
@@ -62,7 +63,7 @@ def feed_cli(api, **kwargs):
         if kwargs.get('bare'):
             rows.append(['url'])
         else:
-            rows.append(['feed id', 'published', 'start date', 'end date', 'url'])
+            rows.append(['feed-id', 'published', 'start-date', 'end-date', 'url'])
 
     for fv in feedversions:
         if finish and fv.dates['start'] > finish:
