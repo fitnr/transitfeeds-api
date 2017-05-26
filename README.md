@@ -101,10 +101,6 @@ for v in versions:
 ````
 https://transitfeeds.com/p/mta/80/20170404/download datetime.date(2017, 4, 8)
 https://transitfeeds.com/p/mta/80/20170109/download datetime.date(2017, 1, 7)
-https://transitfeeds.com/p/mta/80/20160902/download datetime.date(2016, 9, 3)
-https://transitfeeds.com/p/mta/80/20160627/download datetime.date(2016, 7, 2)
-https://transitfeeds.com/p/mta/80/20160324/download datetime.date(2016, 4, 2)
-https://transitfeeds.com/p/mta/80/20151223/download datetime.date(2016, 1, 2)
 https://transitfeeds.com/p/mta/80/20151124/download datetime.date(2015, 9, 5)
 https://transitfeeds.com/p/mta/80/20150921/download datetime.date(2015, 9, 5)
 https://transitfeeds.com/p/mta/80/20150828/download datetime.date(2015, 9, 5)
