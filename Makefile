@@ -1,7 +1,5 @@
 # This file is part of transitfeeds-api.
 # https://github.com/fitnr/transitfeeds-api
-
-# test your application (tests in the tests/ directory)
 test:
 	python setup.py test
 
