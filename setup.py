@@ -16,7 +16,6 @@ except IOError:
 with open('transitfeeds/__init__.py') as i:
     version = next(r for r in i.readlines() if '__version__' in r).split('=')[1].strip('"\' \n')
 
-
 setup(
     name='transitfeeds-api',
     version=version,
@@ -43,6 +42,11 @@ setup(
     install_requires=[
         'requests>=2.13.0',
     ],
+    entry_points={
+        'console_scripts': [
+            'transitfeeds=transitfeeds.cli:main',
+        ],
+    },
     test_suite='tests',
     zip_safe=True,
 )
