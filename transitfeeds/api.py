@@ -90,7 +90,9 @@ class TransitFeeds(object):
         result = r.json()
 
         if result['status'] != 'OK':
-            raise RuntimeError('Got back status: {} ({})'.format(result['status'], statuses[result['status']]))
+            raise RuntimeError('Transitfeeds: Attempted to fetch {}, got back status: {} ({})'.format(
+                operation, result['status'], statuses[result['status']])
+            )
 
         # try to set metadata about query
         for key in METADATA_KEYS.keys():
