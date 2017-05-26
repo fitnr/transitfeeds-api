@@ -14,8 +14,19 @@ from datetime import datetime
 from argparse import ArgumentParser
 from transitfeeds import TransitFeeds
 
+
 FEED_HELP = 'Fetch the versions of a feed in the Transitfeeds database'
 LOCATION_HELP = "Fetch locations in the Transitfeeds database"
+
+if (sys.version_info >= (3, 0)):
+    def utf8(text):
+        return text
+
+else:
+    BrokenPipeError = IOError
+
+    def utf8(text):
+        return text.encode('utf8')
 
 
 def parse_date(datestr):
@@ -29,7 +40,7 @@ def parse_date(datestr):
 def location_cli(api, **kwargs):
     if kwargs['list']:
         locations = api.locations()
-        rows = [[loc.id, loc.title.encode('utf8'), loc.name.encode('utf8'), loc.coords[0], loc.coords[1]] for loc in locations]
+        rows = [[loc.id, utf8(loc.title), utf8(loc.name), loc.coords[0], loc.coords[1]] for loc in locations]
         if kwargs.get('header'):
             rows.insert(0, ['location-id', 'title', 'name', 'longitude', 'latitude'])
 
@@ -40,7 +51,7 @@ def location_cli(api, **kwargs):
     else:
         # get feed objects for the location
         feeds = api.feeds(location=kwargs['id'])
-        rows = [[feed.id, feed.title.encode('utf8')] for feed in feeds]
+        rows = [[feed.id, utf8(feed.title)] for feed in feeds]
         if kwargs.get('header'):
             rows.insert(0, ['feed-id', 'title'])
     return rows
@@ -73,7 +84,7 @@ def feed_cli(api, **kwargs):
             continue
 
         if kwargs.get('bare'):
-            rows.append([fv.url.encode('utf8')])
+            rows.append([utf8(fv.url)])
         else:
             try:
                 feed_start = fv.dates['start'].strftime('%Y-%m-%d')
@@ -85,7 +96,7 @@ def feed_cli(api, **kwargs):
             except (KeyError, AttributeError):
                 feed_finish = ''
 
-            rows.append([fv.id, fv.timestamp.strftime('%Y-%m-%d'), feed_start, feed_finish, fv.url])
+            rows.append([utf8(fv.id), fv.timestamp.strftime('%Y-%m-%d'), feed_start, feed_finish, fv.url])
 
     return rows
 
@@ -126,10 +137,13 @@ def main():
     api = TransitFeeds(args.key)
 
     rows = args.func(api, **vars(args))
-
     writer = csv.writer(sys.stdout, delimiter='\t')
-    for row in rows:
-        writer.writerow(row)
+
+    try:
+        writer.writerows(rows)
+    except (BrokenPipeError, IOError):
+        sys.stderr.close()
+
 
 if __name__ == '__main__':
     main()

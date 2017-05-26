@@ -26,7 +26,7 @@ install:
 
 script:
     - coverage run setup.py test
-    - transitfeeds location --list
+    - transitfeeds location --list | head
     - transitfeeds location -H 119
     - transitfeeds feed mta/81
     - transitfeeds feed -H mta/80
