@@ -53,7 +53,7 @@ class Location(TransitObject):
     @property
     def coords(self):
         '''Returns lon, lat coordinates'''
-        return self.__dict__['lon'], self.__dict__['lat']
+        return self.__dict__.get('lng'), self.__dict__.get('lat')
 
 
 class Feed(TransitObject):
