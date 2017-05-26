@@ -58,7 +58,7 @@ mta/87/20161012	2016-10-12	2016-10-12	2017-04-01	https://transitfeeds.com/p/mta/
 mta/87/20160928	2016-09-28	2016-09-27	2017-04-01	https://transitfeeds.com/p/mta/87/20160928/download
 ````
 
-Fetch feed editions between given dates
+Fetch feed editions between given dates:
 ````
 transitfeeds feed --header mta/87 --start 2016-12-01 --finish 2017-01-01
 ````
@@ -72,6 +72,16 @@ mta/87/20160928	2016-09-28	2016-09-27	2017-04-01	https://transitfeeds.com/p/mta/
 ````
 
 (Note that this includes any editions of a feed that overlap the interval.)
+
+Fetch the most recent version of a feed:
+````
+transitfeeds feed --latest mta/87
+````
+````
+https://transitfeeds-data.s3-us-west-1.amazonaws.com/public/feeds/mta/87/20170522/gtfs.zip
+````
+This returns only the URL.
+
 
 ## Python API
 

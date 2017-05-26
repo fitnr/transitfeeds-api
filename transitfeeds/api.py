@@ -65,8 +65,8 @@ class TransitFeeds(object):
     def latest(self, feed):
         '''
             Args:
-                feed (str): The ID of the feed to retrieve the latest feed version for. You can use the /getFeeds
-                            call to discover feed IDs.
+                feed (str): The ID of the feed to retrieve the latest feed version for.
+                    Use `TransitFeeds.feeds` to discover feed IDs.
             Returns:
                 (str) The URL of the latest feed
         '''

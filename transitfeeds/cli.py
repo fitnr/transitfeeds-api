@@ -62,11 +62,16 @@ def feed_cli(api, **kwargs):
         print('A feed-id required', file=sys.stderr)
         sys.exit(1)
 
+    feed_id = kwargs.get('id')
+
+    if kwargs.get('latest'):
+        return [[api.latest(feed_id)]]
+
     start = parse_date(kwargs['start']) if kwargs.get('start') else None
     finish = parse_date(kwargs['finish']) if kwargs.get('finish') else None
 
     # Fetch all the feeds for this ID
-    feedversions = api.feed_versions(kwargs.get('id'))
+    feedversions = api.feed_versions(feed_id)
 
     # Filter by date
     rows = []
@@ -126,6 +131,7 @@ def main():
     add_boilerplate(feed)
     feed.add_argument('--start', type=str, help='yyyy-mm-dd format')
     feed.add_argument('--finish', type=str, help='yyyy-mm-dd format')
+    feed.add_argument('--latest', action='store_true', help='Return only the URL of the newest feed')
     feed.add_argument('--bare', action='store_true', help='Return only the feed URL, omitting feed metadata')
     feed.set_defaults(func=feed_cli)
 
