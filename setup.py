@@ -19,7 +19,7 @@ with open('transitfeeds/__init__.py') as i:
 setup(
     name='transitfeeds-api',
     version=version,
-    description='Python trapper for transitfeeds.com',
+    description='Python wrapper for transitfeeds.com',
     long_description='''Python wrapper for the transitfeeds.com API''',
     keywords='gtfs transit api',
     author='Neil Freeman',
