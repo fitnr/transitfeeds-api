@@ -40,7 +40,7 @@ setup(
     packages=['transitfeeds'],
     include_package_data=False,
     install_requires=[
-        'requests>=2.13.0',
+        'requests[security]>=2.13.0',
     ],
     entry_points={
         'console_scripts': [
