@@ -7,7 +7,15 @@ Work with the [Transitfeeds](http://transitfeeds.com) API. Not affiliated with T
 
 The command line tool returns feeds as tab-separated data. An [API key](http://transitfeeds.com/api/keys) is required. It can be specified with either the `--key` option or the `TRANSITFEEDS_API_KEY` environment variable.
 
-Fetch a list of locations:
+The cli tool has two main functions: fetching feeds attached to a given location and fetching versions of a particular feed.
+````
+# Fetch information about feeds at this location:
+transitfeeds location <location-id>
+# Fetch versions of this feed:
+transitfeeds feed <feed-id>
+````
+
+An additional function is fetching a list of all locations:
 ````
 transitfeeds location --list --header
 ````

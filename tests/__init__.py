@@ -7,23 +7,26 @@
 # Licensed under the GPLv3 license
 # Copyright (c) 2017, Neil Freeman <contact@fakeisthenewreal.org>
 import sys
-from os import path
+import os
+from io import StringIO
+import warnings
 import json
 from datetime import date, datetime
-from unittest import TestCase
-from transitfeeds import api
-from transitfeeds import models
+import unittest
+from transitfeeds import api, cli, models
 
 if (sys.version_info >= (3, 0)):
     unicode = str
 
-class TransitFeedsTest(TestCase):
 
-    def setUp(self):
-        self.tf = api.TransitFeeds('nope')
+class TransitFeedsTest(unittest.TestCase):
+
+    def self_test_init(self):
+        tf = api.TransitFeeds('nope')
+        self.assertIsInstance(tf, api.TransitFeeds)
 
     def test_FeedVersion(self):
-        with open(path.join(path.dirname(__file__), 'data/getFeedVersions.json')) as f:
+        with open(os.path.join(os.path.dirname(__file__), 'data/getFeedVersions.json')) as f:
             data = json.load(f)
 
         fvs = [models.FeedVersion(**x) for x in data['results']['versions']]
@@ -43,14 +46,12 @@ class TransitFeedsTest(TestCase):
         assert hasattr(issue[0], 'filename')
         assert hasattr(issue[0], 'line')
 
-
     def test_helpers(self):
         d = date(2016, 10, 1)
         self.assertEqual(d, models.ymd_to_date('2016101'))
 
-
     def test_feeds(self):
-        with open(path.join(path.dirname(__file__), 'data/getFeeds.json')) as f:
+        with open(os.path.join(os.path.dirname(__file__), 'data/getFeeds.json')) as f:
             data = json.load(f)
 
         feeds = [models.Feed(**x) for x in data['results']['feeds']]
@@ -66,3 +67,43 @@ class TransitFeedsTest(TestCase):
             self.assertIsInstance(feed.location.name, unicode)
             self.assertIsInstance(feed.location.coords, tuple)
             self.assertIsInstance(feed.location.coords[0], float)
+
+    def test_cli_location(self):
+        cmd = 'location -H 432'.split()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            rows = cli.parse_args(cmd)
+        self.assertSequenceEqual(('feed-id', 'title'), rows[0])
+
+    def test_cli_feed(self):
+        cmd = 'feed -H mta/80'.split()
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            rows = cli.parse_args(cmd)
+
+        self.assertSequenceEqual(('feed-id', 'published', 'start-date', 'end-date', 'url'), rows[0])
+
+    def test_dates(self):
+        d = date(2017, 1, 1)
+        s = '2017-01-01'
+        self.assertEqual(s, cli.strfdate(d))
+        self.assertEqual(d, cli.strpdate(s))
+        self.assertEqual('', cli.strfdate(''))
+
+    def test_cli_help(self):
+        sys.stderr = sys.stdout = StringIO()
+
+        with self.assertRaises(SystemExit):
+            cli.parse_args([])
+
+        with self.assertRaises(SystemExit):
+            cli.parse_args(['feed'])
+
+        with self.assertRaises(SystemExit):
+            cli.parse_args('feed 1 --start foobar'.split())
+
+        with self.assertRaises(SystemExit):
+            cli.parse_args(['location'])
+
+if __name__ == '__main__':
+    unittest.main()
