@@ -28,8 +28,8 @@ script:
     - coverage run setup.py test
     # Ensure that we get far enough in the list to show some non-ascii characters
     - transitfeeds location --list | head -n 40 | tail
-    - transitfeeds location -H 119
-    - transitfeeds feed mta/81
+    - transitfeeds location -H 119 246
+    - transitfeeds feed mta/81 mta/80
     - transitfeeds feed -H mta/80
 
 after_script:

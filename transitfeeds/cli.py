@@ -45,71 +45,74 @@ def strfdate(date):
 
 
 def location_cli(api, **kwargs):
+    ids = kwargs.get('ids', [])
+
     if kwargs['list']:
         locations = api.locations()
-        rows = [[loc.id, utf8(loc.title), utf8(loc.name), loc.coords[0], loc.coords[1]] for loc in locations]
-        if kwargs.get('header'):
-            rows.insert(0, ['location-id', 'title', 'name', 'longitude', 'latitude'])
+        rows = [('location-id', 'title', 'name', 'longitude', 'latitude')] if kwargs.get('header') else []
+        rows.extend([(loc.id, utf8(loc.title), utf8(loc.name), loc.coords[0], loc.coords[1]) for loc in locations])
 
-    elif kwargs['id'] is None:
+    elif len(ids) == 0:
         print('A location-id required', file=sys.stderr)
         sys.exit(1)
 
     else:
-        # get feed objects for the location
-        feeds = api.feeds(location=kwargs['id'])
-        rows = [[feed.id, utf8(feed.title)] for feed in feeds]
-        if kwargs.get('header'):
-            rows.insert(0, ['feed-id', 'title'])
+        rows = [('feed-id', 'title')] if kwargs.get('header') else []
+        # get feed objects for each location
+        for i in ids:
+            rows.extend([(f.id, utf8(f.title)) for f in api.feeds(location=i)])
+
     return rows
 
 
 def feed_cli(api, **kwargs):
-    if kwargs['id'] is None:
+    ids = kwargs.get('ids', [])
+
+    if len(ids) == 0:
         print('A feed-id required', file=sys.stderr)
         sys.exit(1)
 
-    feed_id = kwargs.get('id')
-
     if kwargs.get('latest'):
-        return [[api.latest(feed_id)]]
+        # Complicated list comprehension to filter out empty results.
+        return [[x] for x in (api.latest(i) for i in ids) if x]
 
     start = strpdate(kwargs['start']) if kwargs.get('start') else None
     finish = strpdate(kwargs['finish']) if kwargs.get('finish') else None
 
-    # Fetch all the feeds for this ID
-    feedversions = api.feed_versions(feed_id)
-
     # Filter by date
     rows = []
     if kwargs.get('header'):
-        if kwargs.get('bare'):
-            rows.append(['url'])
-        else:
-            rows.append(['feed-id', 'published', 'start-date', 'end-date', 'url'])
+        row = ('url',) if kwargs.get('bare') else ('feed-id', 'published', 'start-date', 'end-date', 'url')
+        rows.append(row)
 
-    for fv in feedversions:
-        if finish and fv.dates['start'] > finish:
-            continue
+    for i in ids:
+        # Fetch all the feeds for this ID
+        feedversions = api.feed_versions(i)
 
-        if start and fv.dates['finish'] < start:
-            continue
+        for fv in feedversions:
+            if finish and fv.dates['start'] > finish:
+                continue
 
-        if kwargs.get('bare'):
-            rows.append([utf8(fv.url)])
-        else:
-            feed_start = strfdate(fv.dates.get('start', ''))
-            feed_finish = strfdate(fv.dates.get('finish', ''))
-            rows.append([utf8(fv.id), fv.timestamp.strftime('%Y-%m-%d'), feed_start, feed_finish, fv.url])
+            if start and fv.dates['finish'] < start:
+                continue
+
+            if kwargs.get('bare'):
+                row = (utf8(fv.url),)
+            else:
+                f_start = strfdate(fv.dates.get('start', ''))
+                f_finish = strfdate(fv.dates.get('finish', ''))
+                row = (utf8(fv.id), fv.timestamp.strftime('%Y-%m-%d'), f_start, f_finish, fv.url)
+
+            rows.append(row)
 
     return rows
 
 
-def add_boilerplate(parser):
+def add_boilerplate(parser, kind):
     parser.add_argument('--key', default=os.environ.get('TRANSITFEEDS_API_KEY'),
                         help=("Transitfeeds API key. Can be passed as an argument or "
                               "read from the TRANSITFEEDS_API_KEY environment variable"))
-    parser.add_argument('id', type=str, nargs='?', default=None)
+    parser.add_argument('ids', type=str, nargs='*', default=None, help='One or more {}-ids'.format(kind))
     parser.add_argument('-H', '--header', action='store_true', help='Add a header to the output')
 
 
@@ -119,15 +122,15 @@ def main():
     subparsers = parser.add_subparsers()
 
     location = subparsers.add_parser("location", help=LOCATION_HELP, description=LOCATION_HELP)
-    add_boilerplate(location)
+    add_boilerplate(location, 'location')
     location.add_argument('--list', action='store_true')
     location.set_defaults(func=location_cli)
 
     feed = subparsers.add_parser("feed", description=FEED_HELP, help=FEED_HELP,
                                  epilog=('By default the following columns are included: '
-                                         'feed version id, date published, feed start date, feed end date, feed URL')
+                                         'feed-id-version, date published, feed start date, feed end date, feed URL')
                                  )
-    add_boilerplate(feed)
+    add_boilerplate(feed, 'feed')
     feed.add_argument('--start', type=str, help='yyyy-mm-dd format')
     feed.add_argument('--finish', type=str, help='yyyy-mm-dd format')
     feed.add_argument('--latest', action='store_true', help='Return only the URL of the newest feed')

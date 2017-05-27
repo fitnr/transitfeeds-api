@@ -71,7 +71,7 @@ class TransitFeeds(object):
                 (str) The URL of the latest feed
         '''
         r = self._request('getLatestFeedVersion', feed=feed, rargs={'allow_redirects': False})
-        return r.headers['Location']
+        return r.headers.get('Location')
 
     def feed_versions(self, feed, err=None, warn=None, **kwargs):
         warn = warn or 1
