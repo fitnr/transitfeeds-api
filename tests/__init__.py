@@ -8,7 +8,7 @@
 # Copyright (c) 2017, Neil Freeman <contact@fakeisthenewreal.org>
 import sys
 import os
-from io import StringIO
+from io import BytesIO, StringIO
 import warnings
 import json
 from datetime import date, datetime
@@ -17,6 +17,8 @@ from transitfeeds import api, cli, models
 
 if (sys.version_info >= (3, 0)):
     unicode = str
+else:
+    StringIO = BytesIO
 
 
 class TransitFeedsTest(unittest.TestCase):

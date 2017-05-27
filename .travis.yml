@@ -11,7 +11,7 @@ python:
     - 3.4
     - 3.5
     - 3.6
-    - pypy
+    - pypy-5.4
 
 git:
   depth: 3
