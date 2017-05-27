@@ -34,8 +34,10 @@ class TransitFeeds(object):
     page = None
     num_pages = None
 
-    def __init__(self, key):
+    def __init__(self, key, session=None):
         self.key = key
+        # If no session is passed, just use the requests module
+        self.get = session.get if session else requests.get
 
     def locations(self):
         results = self._request_results('getLocations')
@@ -82,7 +84,7 @@ class TransitFeeds(object):
     def _request(self, operation, rargs=None, **params):
         params['key'] = self.key
         rargs = rargs or {}
-        r = requests.get(self.base + operation, headers=self.headers, params=params, **rargs)
+        r = self.get(self.base + operation, headers=self.headers, params=params, **rargs)
         return r
 
     def _request_results(self, operation, **params):

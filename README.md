@@ -107,3 +107,13 @@ datetime.date(2015, 9, 5)
 datetime.date(2015, 9, 5)
 datetime.date(2015, 6, 27)
 ````
+
+### Sessions
+
+The `TransitFeeds` class optionally accepts a `requests.Session`, which can speed up multiple requests:
+```
+import requests
+with requests.session() as session:
+   tf = TransitFeeds(API_KEY, session=session)
+   # Use the API multiple times here
+```

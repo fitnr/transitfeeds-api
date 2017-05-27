@@ -12,6 +12,7 @@ import os
 import csv
 from datetime import datetime
 from argparse import ArgumentParser
+from requests import Session
 from transitfeeds import TransitFeeds
 
 
@@ -142,7 +143,9 @@ def main():
         sys.exit(1)
 
     args = parser.parse_args()
-    api = TransitFeeds(args.key)
+    with Session() as s:
+        api = TransitFeeds(args.key, s)
+        return args.func(api, **vars(args))
 
     rows = args.func(api, **vars(args))
     writer = csv.writer(sys.stdout, delimiter='\t')
