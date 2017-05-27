@@ -29,12 +29,19 @@ else:
         return text.encode('utf8')
 
 
-def parse_date(datestr):
+def strpdate(datestr):
     try:
         return datetime.strptime(datestr, '%Y-%m-%d').date()
     except ValueError:
         print('invalid date', datestr, file=sys.stderr)
         sys.exit(1)
+
+
+def strfdate(date):
+    try:
+        return date.strftime('%Y-%m-%d')
+    except AttributeError:
+        return ''
 
 
 def location_cli(api, **kwargs):
@@ -67,8 +74,8 @@ def feed_cli(api, **kwargs):
     if kwargs.get('latest'):
         return [[api.latest(feed_id)]]
 
-    start = parse_date(kwargs['start']) if kwargs.get('start') else None
-    finish = parse_date(kwargs['finish']) if kwargs.get('finish') else None
+    start = strpdate(kwargs['start']) if kwargs.get('start') else None
+    finish = strpdate(kwargs['finish']) if kwargs.get('finish') else None
 
     # Fetch all the feeds for this ID
     feedversions = api.feed_versions(feed_id)
@@ -91,16 +98,8 @@ def feed_cli(api, **kwargs):
         if kwargs.get('bare'):
             rows.append([utf8(fv.url)])
         else:
-            try:
-                feed_start = fv.dates['start'].strftime('%Y-%m-%d')
-            except (KeyError, AttributeError):
-                feed_start = ''
-
-            try:
-                feed_finish = fv.dates['finish'].strftime('%Y-%m-%d')
-            except (KeyError, AttributeError):
-                feed_finish = ''
-
+            feed_start = strfdate(fv.dates.get('start', ''))
+            feed_finish = strfdate(fv.dates.get('finish', ''))
             rows.append([utf8(fv.id), fv.timestamp.strftime('%Y-%m-%d'), feed_start, feed_finish, fv.url])
 
     return rows
