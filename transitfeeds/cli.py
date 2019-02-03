@@ -19,7 +19,7 @@ from transitfeeds import TransitFeeds
 FEED_HELP = 'Fetch the versions of a feed on the Transitfeeds.com'
 LOCATION_HELP = "Fetch feeds attached to locations on the Transitfeeds.com"
 
-if (sys.version_info >= (3, 0)):
+if sys.version_info >= (3, 0):
     def utf8(text):
         return text
 
@@ -132,13 +132,13 @@ def parse_args(input_args):
     feed.add_argument('--latest', action='store_true', help='Return only the URL of the newest feed')
     feed.set_defaults(func=feed_cli)
 
-    if len(input_args) == 0:
+    if not input_args:
         parser.print_help()
         sys.exit(1)
 
     args = parser.parse_args(input_args)
 
-    if getattr(args, 'list', False) is False and len(args.ids) == 0:
+    if getattr(args, 'list', False) is False and not args.ids:
         p = feed if (args.func == feed_cli) else location
         p.print_help()
         sys.exit(1)
@@ -149,7 +149,7 @@ def parse_args(input_args):
 
 def main():
     rows = parse_args(sys.argv[1:])
-    writer = csv.writer(sys.stdout, delimiter='\t')
+    writer = csv.writer(sys.stdout, delimiter='\t', lineterminator=os.linesep)
 
     try:
         writer.writerows(rows)

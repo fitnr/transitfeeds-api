@@ -5,7 +5,7 @@
 test:; python setup.py test
 
 deploy: README.rst
-	python setup.py register
+	twine register
 	git push
 	git push --tags
 	rm -rf dist build

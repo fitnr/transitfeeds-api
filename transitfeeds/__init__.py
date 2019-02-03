@@ -11,5 +11,5 @@ from . import api
 from . import models
 from .api import TransitFeeds
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 __all__ = ['api', 'models']
